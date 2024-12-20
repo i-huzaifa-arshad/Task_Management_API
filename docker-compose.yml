@@ -1,0 +1,78 @@
+services:
+  app:
+    build: .
+    container_name: selteq_task_app
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    environment:
+      - DJANGO_SETTINGS_MODULE=selteq_task.settings
+      - CELERY_BROKER_URL=redis://redis:6380/0
+      - DB_HOST=sql_server
+      - DB_PORT=1433
+      - DB_NAME=selteq_db
+      - DB_USER=sa
+      - DB_PASSWORD=StrongPassword123!
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - sql_server
+    networks:
+      - selteq_network
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6380:6380"
+    command: ["redis-server", "--port", "6380"]
+    volumes:
+      - redis_data:/data
+    networks:
+      - selteq_network
+
+  celery:
+    build: .
+    container_name: celery_worker
+    command: ["celery", "-A", "selteq_task", "worker", "--loglevel=info", "-P", "solo"]
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6380/0
+    depends_on:
+      - redis
+    networks:
+      - selteq_network
+
+  celery_beat:
+    build: .
+    container_name: celery_beat
+    command: ["celery", "-A", "selteq_task", "beat", "--loglevel=info"]
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6380/0
+    depends_on:
+      - redis
+    networks:
+      - selteq_network
+
+  sql_server:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql_server
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=StrongPassword123!
+    ports:
+      - "1433:1433"
+    networks:
+      - selteq_network
+    volumes:
+      - sql_data:/var/opt/mssql
+
+networks:
+  selteq_network:
+    driver: bridge
+
+volumes:
+  redis_data:
+    driver: local
+  sql_data:
+    driver: local
