@@ -26,23 +26,23 @@ After building the images, follow these steps to set up the SQL Server database 
    ```
 3. Restart the `app` container to apply changes
    ```
-   docker-compose restart app
+   docker compose restart app
    ```
 
 ### 3. Apply migrations
 
 1. Run Django migrations:
    ```
-   docker-compose exec -it app python manage.py makemigrations
-   docker-compose exec -it app python manage.py migrate
+   docker compose exec -it app python manage.py makemigrations
+   docker compose exec -it app python manage.py migrate
    ```
 2. Restart the `app` container to apply changes
    ```
-   docker-compose restart app
+   docker compose restart app
    ```
 3. Create a superuser to access Django admin interface
    ```
-   docker-compose exec -it app python manage.py createsuperuser
+   docker compose exec -it app python manage.py createsuperuser
    ```
 4. You can access the admin interface at: `http://127.0.0.1:8000/admin`
 
