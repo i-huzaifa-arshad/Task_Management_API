@@ -1,4 +1,4 @@
-# Dockerized Task Management Django Application (For Selteq)
+# Dockerized Task Management Django Application
 
 This repository contains a Dockerized Task Management Django application that uses a Microsoft SQL Server database along with Redis and Celery for asynchronous task handling.
 
